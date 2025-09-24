@@ -2,13 +2,13 @@ const geolib = require("geolib");
 const User = require("../models/User");
 const Class = require("../models/Class");
 const Attendance = require("../models/Attendance");
-const Subject = require('../models/Subject');
+const Subject = require("../models/Subject");
 
 const FIXED_LOCATION = {
-  //latitude: 13.014720706793945,
-  //longitude: 77.66648958209365,
-  latitude: 13.006058,
-  longitude: 77.651001,
+  latitude: 13.014720706793945,
+  longitude: 77.66648958209365,
+  //latitude: 13.006058,
+  //longitude: 77.651001,
 };
 
 const euclideanDistance = (arr1, arr2) => {
@@ -65,7 +65,9 @@ exports.markAttendance = async (req, res) => {
       return res.status(400).json({ message: "Class not found" });
 
     // 🔥 Fetch full student details from DB
-    const studentDoc = await User.findById(req.user.id).select("course semester role");
+    const studentDoc = await User.findById(req.user.id).select(
+      "course semester role"
+    );
     if (!studentDoc || studentDoc.role !== "student") {
       return res.status(403).json({ message: "Unauthorized" });
     }
@@ -99,7 +101,9 @@ exports.markAttendance = async (req, res) => {
     });
 
     if (alreadyMarked)
-      return res.status(400).json({ message: "Attendance already marked for this class" });
+      return res
+        .status(400)
+        .json({ message: "Attendance already marked for this class" });
 
     const attendance = new Attendance({
       student: matchedUser._id,
@@ -114,7 +118,6 @@ exports.markAttendance = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
 
 // ==============================
 // @desc    Get Student's Attendance History
@@ -143,7 +146,9 @@ exports.getStudentHistory = async (req, res) => {
 exports.getStudentAnalytics = async (req, res) => {
   try {
     // 1) Fetch the student document
-    const student = await User.findById(req.user.id).select("course semester role");
+    const student = await User.findById(req.user.id).select(
+      "course semester role"
+    );
     if (!student || student.role !== "student") {
       return res.status(401).json({ message: "Unauthorized" });
     }
@@ -170,7 +175,10 @@ exports.getStudentAnalytics = async (req, res) => {
 
     // Count present marks
     for (let record of attendanceRecords) {
-      const cls = await Class.findById(record.class).populate("subject", "name");
+      const cls = await Class.findById(record.class).populate(
+        "subject",
+        "name"
+      );
       if (cls && record.status === "present") {
         const subjectName = cls.subject?.name || "Unknown";
         if (subjectStats[subjectName]) {
@@ -183,7 +191,9 @@ exports.getStudentAnalytics = async (req, res) => {
     const result = Object.entries(subjectStats).map(([subject, stats]) => ({
       subject,
       percentage:
-        stats.total === 0 ? 0 : ((stats.present / stats.total) * 100).toFixed(2),
+        stats.total === 0
+          ? 0
+          : ((stats.present / stats.total) * 100).toFixed(2),
     }));
 
     res.status(200).json(result);
@@ -221,7 +231,11 @@ exports.getClassAttendance = async (req, res) => {
       );
       return {
         student,
-        status: record ? (record.status === "present" ? "Present" : "Absent") : "Absent"
+        status: record
+          ? record.status === "present"
+            ? "Present"
+            : "Absent"
+          : "Absent",
       };
     });
 
@@ -231,7 +245,6 @@ exports.getClassAttendance = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
 
 // ==============================
 // @desc    Get Pending Classes for Student
@@ -244,16 +257,18 @@ exports.getPendingClasses = async (req, res) => {
     const studentId = req.user.id;
 
     // 1) Load the student to get course/semester
-    const student = await User.findById(studentId).select('role course semester');
-    if (!student || student.role !== 'student') {
-      return res.status(401).json({ message: 'Unauthorized' });
+    const student = await User.findById(studentId).select(
+      "role course semester"
+    );
+    if (!student || student.role !== "student") {
+      return res.status(401).json({ message: "Unauthorized" });
     }
 
     // 2) Build a local-date string (avoids UTC off-by-one issues)
     const now = new Date();
-    const todayStr = new Date(
-      now.getFullYear(), now.getMonth(), now.getDate()
-    ).toISOString().slice(0, 10); // YYYY-MM-DD
+    const todayStr = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+      .toISOString()
+      .slice(0, 10); // YYYY-MM-DD
 
     // 3) Fetch classes for the student's course/semester that are today or later
     const classes = await Class.find({
@@ -262,18 +277,22 @@ exports.getPendingClasses = async (req, res) => {
       date: { $gte: todayStr },
     })
       .sort({ date: 1, startTime: 1 })
-      .populate('subject', 'name'); // so cls.subject?.name works on the frontend
+      .populate("subject", "name"); // so cls.subject?.name works on the frontend
 
     // 4) Exclude already-marked
-    const attendance = await Attendance.find({ student: studentId }).select('class');
-    const attendedClassIds = new Set(attendance.map(a => a.class.toString()));
+    const attendance = await Attendance.find({ student: studentId }).select(
+      "class"
+    );
+    const attendedClassIds = new Set(attendance.map((a) => a.class.toString()));
 
-    const pending = classes.filter(cls => !attendedClassIds.has(cls._id.toString()));
+    const pending = classes.filter(
+      (cls) => !attendedClassIds.has(cls._id.toString())
+    );
 
     return res.status(200).json(pending);
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -287,10 +306,15 @@ exports.updateAttendance = async (req, res) => {
     const { classId, studentId, present } = req.body;
 
     if (!classId || !studentId) {
-      return res.status(400).json({ message: "ClassId and StudentId required" });
+      return res
+        .status(400)
+        .json({ message: "ClassId and StudentId required" });
     }
 
-    let record = await Attendance.findOne({ class: classId, student: studentId });
+    let record = await Attendance.findOne({
+      class: classId,
+      student: studentId,
+    });
 
     if (record) {
       // update existing record
@@ -322,33 +346,45 @@ exports.getTeacherAnalytics = async (req, res) => {
   try {
     const teacherId = req.user.id;
 
-    // Find all classes taught by this teacher
-    const classes = await Class.find({ teacher: teacherId }).populate("subject", "name");
-    if (!classes || classes.length === 0) {
-      return res.status(200).json([]); // no classes → no analytics
-    }
+    // Get all classes taught by this teacher
+    const classes = await Class.find({ teacher: teacherId }).populate(
+      "subject",
+      "name"
+    );
+    if (!classes.length) return res.status(200).json([]);
 
-    let analytics = [];
+    // Group classes by subject
+    const subjectMap = {};
+    classes.forEach((cls) => {
+      const subjectName = cls.subject?.name || "Unknown";
+      if (!subjectMap[subjectName]) subjectMap[subjectName] = [];
+      subjectMap[subjectName].push(cls._id);
+    });
 
-    for (let cls of classes) {
-      // Get all attendance records for this class
-      const attendanceRecords = await Attendance.find({ class: cls._id });
+    const analytics = [];
 
-      if (attendanceRecords.length === 0) {
-        analytics.push({
-          subject: cls.subject?.name || "Unknown",
-          percentage: 0,
-        });
-        continue;
-      }
-
-      const presentCount = attendanceRecords.filter(r => r.status === "present").length;
-      const percentage = Math.round((presentCount / attendanceRecords.length) * 100);
-
-      analytics.push({
-        subject: cls.subject?.name || "Unknown",
-        percentage,
+    // For each subject, calculate total present and total possible
+    for (let [subject, classIds] of Object.entries(subjectMap)) {
+      const attendanceRecords = await Attendance.find({
+        class: { $in: classIds },
       });
+
+      // Total students in all classes
+      const totalStudents = await Attendance.distinct("student", {
+        class: { $in: classIds },
+      });
+      const totalPossible = totalStudents.length * classIds.length; // students × classes
+
+      const totalPresent = attendanceRecords.filter(
+        (r) => r.status === "present"
+      ).length;
+
+      const percentage =
+        totalPossible > 0
+          ? Math.round((totalPresent / totalPossible) * 100)
+          : 0;
+
+      analytics.push({ subject, percentage });
     }
 
     res.status(200).json(analytics);
@@ -366,9 +402,12 @@ exports.getTeacherAnalytics = async (req, res) => {
 exports.getTeacherStudentsAttendance = async (req, res) => {
   try {
     const { course, semester, subject, month, year, overall } = req.query;
+    const overallFlag = overall === "true"; // convert string to boolean
 
     if (!course || !semester || !subject) {
-      return res.status(400).json({ message: "Course, semester, and subject required" });
+      return res
+        .status(400)
+        .json({ message: "Course, semester, and subject required" });
     }
 
     // 1) Find all classes for this teacher + course + semester
@@ -376,24 +415,35 @@ exports.getTeacherStudentsAttendance = async (req, res) => {
       teacher: req.user.id,
       course,
       semester,
-    }).populate("subject", "name date");
+    }).populate("subject", "name date startTime endTime");
 
     // 2) Filter by subject
-    classes = classes.filter(cls => cls.subject?.name === subject);
+    classes = classes.filter((cls) => cls.subject?.name === subject);
 
     // 3) Filter by month/year if monthly view (overall = false)
-    if (!overall) {
-      if (!month || !year) return res.status(400).json({ message: "Month and year required for monthly view" });
-      classes = classes.filter(cls => {
+    if (!overallFlag) {
+      if (!month || !year)
+        return res
+          .status(400)
+          .json({ message: "Month and year required for monthly view" });
+
+      classes = classes.filter((cls) => {
         const classDate = new Date(cls.date);
-        return classDate.getMonth() + 1 === parseInt(month) && classDate.getFullYear() === parseInt(year);
+        return (
+          classDate.getMonth() + 1 === parseInt(month) &&
+          classDate.getFullYear() === parseInt(year)
+        );
       });
     }
 
     if (classes.length === 0) return res.status(200).json([]);
 
     // 4) Get all students for this course/semester
-    const students = await User.find({ role: "student", course, semester }).select("name email");
+    const students = await User.find({
+      role: "student",
+      course,
+      semester,
+    }).select("name email");
 
     // 5) Build attendance matrix
     const attendanceMatrix = [];
@@ -403,18 +453,28 @@ exports.getTeacherStudentsAttendance = async (req, res) => {
       let presentCount = 0;
 
       for (let cls of classes) {
-        const record = await Attendance.findOne({ student: student._id, class: cls._id });
+        const record = await Attendance.findOne({
+          student: student._id,
+          class: cls._id,
+        });
         const status = record ? record.status : "absent";
-        attendance[cls.date] = status;
+
+        // Use date + time as key
+        const dateTimeKey = `${cls.date} ${cls.startTime}-${cls.endTime}`;
+        attendance[dateTimeKey] = status;
+
         if (status === "present") presentCount++;
       }
 
       const totalClasses = classes.length;
-      const percentage = totalClasses === 0 ? 0 : ((presentCount / totalClasses) * 100).toFixed(2);
+      const percentage =
+        totalClasses === 0
+          ? 0
+          : ((presentCount / totalClasses) * 100).toFixed(2);
 
       attendanceMatrix.push({
         student,
-        attendance,
+        attendance, // keys are "YYYY-MM-DD HH:MM-HH:MM"
         totalClasses,
         presentCount,
         percentage,
@@ -422,7 +482,6 @@ exports.getTeacherStudentsAttendance = async (req, res) => {
     }
 
     res.status(200).json(attendanceMatrix);
-
   } catch (err) {
     console.error("❌ getTeacherStudentsAttendance error:", err);
     res.status(500).json({ message: "Server error" });
@@ -439,9 +498,9 @@ exports.getTeacherOptions = async (req, res) => {
     const teacherId = req.user.id;
     const subjects = await Subject.find({ teacher: teacherId });
 
-    const courses = [...new Set(subjects.map(s => s.course))];
-    const semesters = [...new Set(subjects.map(s => s.semester))];
-    const subjectNames = [...new Set(subjects.map(s => s.name))];
+    const courses = [...new Set(subjects.map((s) => s.course))];
+    const semesters = [...new Set(subjects.map((s) => s.semester))];
+    const subjectNames = [...new Set(subjects.map((s) => s.name))];
 
     res.status(200).json({ courses, semesters, subjects: subjectNames });
   } catch (err) {
@@ -454,19 +513,30 @@ exports.getAttendanceMonths = async (req, res) => {
   try {
     const { course, semester, subject } = req.query;
     if (!course || !semester || !subject) {
-      return res.status(400).json({ message: "Course, semester, and subject required" });
+      return res
+        .status(400)
+        .json({ message: "Course, semester, and subject required" });
     }
 
-    const classes = await Class.find({ course, semester }).populate("subject", "name");
-    const filteredClasses = classes.filter(cls => cls.subject?.name === subject);
+    const classes = await Class.find({ course, semester }).populate(
+      "subject",
+      "name"
+    );
+    const filteredClasses = classes.filter(
+      (cls) => cls.subject?.name === subject
+    );
 
     // Get unique month-year strings like "2025-09"
-    const months = Array.from(new Set(
-      filteredClasses.map(cls => {
-        const d = new Date(cls.date);
-        return `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, "0")}`;
-      })
-    ));
+    const months = Array.from(
+      new Set(
+        filteredClasses.map((cls) => {
+          const d = new Date(cls.date);
+          return `${d.getFullYear()}-${(d.getMonth() + 1)
+            .toString()
+            .padStart(2, "0")}`;
+        })
+      )
+    );
 
     res.status(200).json(months);
   } catch (err) {

@@ -4,7 +4,14 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import "react-datepicker/dist/react-datepicker.css";
 
-export default function StudentsTab({ filters, setFilters, options, studentsData, setStudentsData, token }) {
+export default function StudentsTab({
+  filters,
+  setFilters,
+  options,
+  studentsData,
+  setStudentsData,
+  token,
+}) {
   const [availableMonths, setAvailableMonths] = useState([]);
 
   // Fetch available months for selected course/semester/subject
@@ -38,7 +45,9 @@ export default function StudentsTab({ filters, setFilters, options, studentsData
   // Disable months that are not in availableMonths
   const isMonthDisabled = (date) => {
     return !availableMonths.some(
-      (m) => m.getFullYear() === date.getFullYear() && m.getMonth() === date.getMonth()
+      (m) =>
+        m.getFullYear() === date.getFullYear() &&
+        m.getMonth() === date.getMonth()
     );
   };
 
@@ -76,7 +85,9 @@ export default function StudentsTab({ filters, setFilters, options, studentsData
   // Render attendance table
   const renderTable = () => {
     if (!studentsData || studentsData.length === 0)
-      return <p className="text-center text-gray-500 mt-4">No attendance data.</p>;
+      return (
+        <p className="text-center text-gray-500 mt-4">No attendance data.</p>
+      );
 
     const allDates = Array.from(
       new Set(studentsData.flatMap((s) => Object.keys(s.attendance)))
@@ -89,11 +100,15 @@ export default function StudentsTab({ filters, setFilters, options, studentsData
             <tr className="bg-indigo-100">
               <th className="border px-2 py-1">Name</th>
               <th className="border px-2 py-1">Email</th>
-              {allDates.map((date, idx) => (
-                <th key={idx} className="border px-2 py-1 text-sm">
-                  {new Date(date).getDate()}
-                </th>
-              ))}
+              {allDates.map((key, idx) => {
+                const [date, time] = key.split(" ");
+                return (
+                  <th key={idx} className="border px-2 py-1 text-sm">
+                    {new Date(date).toLocaleDateString("en-GB")} <br /> {time}
+                  </th>
+                );
+              })}
+
               <th className="border px-2 py-1">Total</th>
               <th className="border px-2 py-1">Present</th>
               <th className="border px-2 py-1">%</th>
@@ -104,9 +119,9 @@ export default function StudentsTab({ filters, setFilters, options, studentsData
               <tr key={idx} className="text-center">
                 <td className="border px-2 py-1">{s.student.name}</td>
                 <td className="border px-2 py-1">{s.student.email}</td>
-                {allDates.map((date, i) => (
+                {allDates.map((key, i) => (
                   <td key={i} className="border px-1 py-1">
-                    {s.attendance[date] === "present" ? (
+                    {s.attendance[key] === "present" ? (
                       <span className="text-green-500 font-bold">✅</span>
                     ) : (
                       <span className="text-red-500 font-bold">❌</span>

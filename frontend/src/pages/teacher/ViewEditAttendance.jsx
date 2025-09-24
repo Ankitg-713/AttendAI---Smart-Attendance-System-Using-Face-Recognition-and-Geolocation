@@ -9,7 +9,7 @@ export default function ViewEditAttendance() {
   const [selectedSubject, setSelectedSubject] = useState("");
   const [availableDates, setAvailableDates] = useState([]); // Dates for selected subject
   const [selectedDate, setSelectedDate] = useState(null);
-  const [records, setRecords] = useState([]);
+  const [records, setRecords] = useState([]); // [{ classInfo, records }]
   const [status, setStatus] = useState("");
   const token = localStorage.getItem("token");
   const toastActive = useRef(false);
@@ -18,9 +18,10 @@ export default function ViewEditAttendance() {
   useEffect(() => {
     const fetchClasses = async () => {
       try {
-        const res = await axios.get("http://localhost:8000/api/classes/teacher", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await axios.get(
+          "http://localhost:8000/api/classes/teacher",
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
         setClasses(res.data || []);
         if (!toastActive.current) {
           toastActive.current = true;
@@ -48,8 +49,12 @@ export default function ViewEditAttendance() {
       return;
     }
 
-    const filtered = classes.filter(cls => cls.subject?.name === selectedSubject);
-    const dates = filtered.map(cls => new Date(cls.date).setHours(0, 0, 0, 0));
+    const filtered = classes.filter(
+      (cls) => cls.subject?.name === selectedSubject
+    );
+    const dates = Array.from(
+      new Set(filtered.map((cls) => new Date(cls.date).setHours(0, 0, 0, 0)))
+    );
     setAvailableDates(dates);
     setSelectedDate(null);
     setRecords([]);
@@ -61,27 +66,43 @@ export default function ViewEditAttendance() {
       if (!selectedSubject || !selectedDate) return;
 
       try {
-        const cls = classes.find(
-          c =>
+        // Filter all classes of the subject on the selected date
+        const filteredClasses = classes.filter(
+          (c) =>
             c.subject?.name === selectedSubject &&
-            new Date(c.date).setHours(0, 0, 0, 0) === selectedDate.setHours(0, 0, 0, 0)
+            new Date(c.date).setHours(0, 0, 0, 0) ===
+              selectedDate.setHours(0, 0, 0, 0)
         );
 
-        if (!cls) {
+        if (filteredClasses.length === 0) {
           setRecords([]);
           return;
         }
 
-        const res = await axios.get(
-          `http://localhost:8000/api/attendance/class/${cls._id}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        setRecords(res.data || []);
+        const attendanceData = [];
+
+        for (let cls of filteredClasses) {
+          const res = await axios.get(
+            `http://localhost:8000/api/attendance/class/${cls._id}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+
+          attendanceData.push({
+            classInfo: cls,
+            records: res.data || [],
+          });
+        }
+
+        setRecords(attendanceData);
         setStatus("");
-        if (!res.data || res.data.length === 0) {
+
+        if (
+          attendanceData.length === 0 ||
+          attendanceData.every((c) => c.records.length === 0)
+        ) {
           if (!toastActive.current) {
             toastActive.current = true;
-            toast("No students found for this class", { icon: "ℹ️" });
+            toast("No students found for these classes", { icon: "ℹ️" });
             setTimeout(() => (toastActive.current = false), 100);
           }
         } else if (!toastActive.current) {
@@ -104,25 +125,23 @@ export default function ViewEditAttendance() {
   }, [selectedSubject, selectedDate, classes, token]);
 
   // Handle attendance toggle
-  const handleToggleAttendance = async (studentId, present) => {
+  const handleToggleAttendance = async (studentId, present, classId) => {
     try {
-      const cls = classes.find(
-        c =>
-          c.subject?.name === selectedSubject &&
-          new Date(c.date).setHours(0, 0, 0, 0) === selectedDate.setHours(0, 0, 0, 0)
-      );
-      if (!cls) return;
-
       await axios.post(
         "http://localhost:8000/api/attendance/update",
-        { classId: cls._id, studentId, present },
+        { classId, studentId, present },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      setRecords(prev =>
-        prev.map(r =>
-          r.student._id === studentId ? { ...r, status: present ? "Present" : "Absent" } : r
-        )
+      setRecords((prev) =>
+        prev.map((item) => ({
+          ...item,
+          records: item.records.map((r) =>
+            r.student._id === studentId && item.classInfo._id === classId
+              ? { ...r, status: present ? "Present" : "Absent" }
+              : r
+          ),
+        }))
       );
 
       if (!toastActive.current) {
@@ -151,23 +170,27 @@ export default function ViewEditAttendance() {
         {/* Subject */}
         <select
           value={selectedSubject}
-          onChange={e => setSelectedSubject(e.target.value)}
+          onChange={(e) => setSelectedSubject(e.target.value)}
           className="flex-1 p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4f46e5]"
         >
           <option value="">-- Select Subject --</option>
-          {Array.from(new Set(classes.map(cls => cls.subject?.name))).map(sub => (
-            <option key={sub} value={sub}>{sub}</option>
-          ))}
+          {Array.from(new Set(classes.map((cls) => cls.subject?.name))).map(
+            (sub) => (
+              <option key={sub} value={sub}>
+                {sub}
+              </option>
+            )
+          )}
         </select>
 
         {/* DatePicker */}
         <DatePicker
           selected={selectedDate}
-          onChange={date => setSelectedDate(date)}
+          onChange={(date) => setSelectedDate(date)}
           dateFormat="dd/MM/yyyy"
           placeholderText="Select Date"
           className="flex-1 p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4f46e5]"
-          filterDate={date =>
+          filterDate={(date) =>
             availableDates.includes(date.setHours(0, 0, 0, 0))
           }
         />
@@ -176,38 +199,52 @@ export default function ViewEditAttendance() {
       {/* Status */}
       {status && <p className="text-center text-gray-600 mb-4">{status}</p>}
 
-      {/* Attendance Table */}
-      {records.length > 0 && (
-        <div className="overflow-x-auto">
-          <table className="w-full border border-gray-200 rounded-xl">
-            <thead className="bg-indigo-50">
-              <tr>
-                <th className="p-3 text-left">Name</th>
-                <th className="p-3 text-left">Email</th>
-                <th className="p-3 text-center">Present</th>
-              </tr>
-            </thead>
-            <tbody>
-              {records.map(record => (
-                <tr key={record.student._id} className="border-t border-gray-200">
-                  <td className="p-3">{record.student.name}</td>
-                  <td className="p-3">{record.student.email}</td>
-                  <td className="p-3 text-center">
-                    <input
-                      type="checkbox"
-                      checked={record.status === "Present"}
-                      onChange={e =>
-                        handleToggleAttendance(record.student._id, e.target.checked)
-                      }
-                      className="w-5 h-5"
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      {/* Attendance Tables for multiple classes */}
+      {records.length > 0 &&
+        records.map(({ classInfo, records: classRecords }) => (
+          <div key={classInfo._id} className="mb-6">
+            <h3 className="text-indigo-600 font-bold mb-2">
+              {new Date(classInfo.date).toLocaleDateString("en-GB")} -{" "}
+              {classInfo.startTime} to {classInfo.endTime}
+            </h3>
+            <div className="overflow-x-auto">
+              <table className="w-full border border-gray-200 rounded-xl">
+                <thead className="bg-indigo-50">
+                  <tr>
+                    <th className="p-3 text-left">Name</th>
+                    <th className="p-3 text-left">Email</th>
+                    <th className="p-3 text-center">Present</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {classRecords.map((record) => (
+                    <tr
+                      key={record.student._id}
+                      className="border-t border-gray-200"
+                    >
+                      <td className="p-3">{record.student.name}</td>
+                      <td className="p-3">{record.student.email}</td>
+                      <td className="p-3 text-center">
+                        <input
+                          type="checkbox"
+                          checked={record.status === "Present"}
+                          onChange={(e) =>
+                            handleToggleAttendance(
+                              record.student._id,
+                              e.target.checked,
+                              classInfo._id
+                            )
+                          }
+                          className="w-5 h-5"
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ))}
 
       {!status && records.length === 0 && selectedDate && (
         <p className="text-center text-gray-500 mt-4">
