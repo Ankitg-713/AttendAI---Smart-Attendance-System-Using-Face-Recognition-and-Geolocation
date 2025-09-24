@@ -2,6 +2,7 @@ const geolib = require("geolib");
 const User = require("../models/User");
 const Class = require("../models/Class");
 const Attendance = require("../models/Attendance");
+const Subject = require('../models/Subject');
 
 const FIXED_LOCATION = {
   //latitude: 13.014720706793945,
@@ -357,3 +358,119 @@ exports.getTeacherAnalytics = async (req, res) => {
   }
 };
 
+// ==============================
+// @desc    Get Students Attendance (Monthly or Overall)
+// @route   GET /api/attendance/teacher/students
+// @access  Teacher only
+// ==============================
+exports.getTeacherStudentsAttendance = async (req, res) => {
+  try {
+    const { course, semester, subject, month, year, overall } = req.query;
+
+    if (!course || !semester || !subject) {
+      return res.status(400).json({ message: "Course, semester, and subject required" });
+    }
+
+    // 1) Find all classes for this teacher + course + semester
+    let classes = await Class.find({
+      teacher: req.user.id,
+      course,
+      semester,
+    }).populate("subject", "name date");
+
+    // 2) Filter by subject
+    classes = classes.filter(cls => cls.subject?.name === subject);
+
+    // 3) Filter by month/year if monthly view (overall = false)
+    if (!overall) {
+      if (!month || !year) return res.status(400).json({ message: "Month and year required for monthly view" });
+      classes = classes.filter(cls => {
+        const classDate = new Date(cls.date);
+        return classDate.getMonth() + 1 === parseInt(month) && classDate.getFullYear() === parseInt(year);
+      });
+    }
+
+    if (classes.length === 0) return res.status(200).json([]);
+
+    // 4) Get all students for this course/semester
+    const students = await User.find({ role: "student", course, semester }).select("name email");
+
+    // 5) Build attendance matrix
+    const attendanceMatrix = [];
+
+    for (let student of students) {
+      let attendance = {};
+      let presentCount = 0;
+
+      for (let cls of classes) {
+        const record = await Attendance.findOne({ student: student._id, class: cls._id });
+        const status = record ? record.status : "absent";
+        attendance[cls.date] = status;
+        if (status === "present") presentCount++;
+      }
+
+      const totalClasses = classes.length;
+      const percentage = totalClasses === 0 ? 0 : ((presentCount / totalClasses) * 100).toFixed(2);
+
+      attendanceMatrix.push({
+        student,
+        attendance,
+        totalClasses,
+        presentCount,
+        percentage,
+      });
+    }
+
+    res.status(200).json(attendanceMatrix);
+
+  } catch (err) {
+    console.error("❌ getTeacherStudentsAttendance error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// ==============================
+// @desc    Get teacher's courses, semesters, subjects
+// @route   GET /api/teacher/options
+// @access  Teacher only
+// ==============================
+exports.getTeacherOptions = async (req, res) => {
+  try {
+    const teacherId = req.user.id;
+    const subjects = await Subject.find({ teacher: teacherId });
+
+    const courses = [...new Set(subjects.map(s => s.course))];
+    const semesters = [...new Set(subjects.map(s => s.semester))];
+    const subjectNames = [...new Set(subjects.map(s => s.name))];
+
+    res.status(200).json({ courses, semesters, subjects: subjectNames });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+// GET /api/attendance/teacher/months?course=...&semester=...&subject=...
+exports.getAttendanceMonths = async (req, res) => {
+  try {
+    const { course, semester, subject } = req.query;
+    if (!course || !semester || !subject) {
+      return res.status(400).json({ message: "Course, semester, and subject required" });
+    }
+
+    const classes = await Class.find({ course, semester }).populate("subject", "name");
+    const filteredClasses = classes.filter(cls => cls.subject?.name === subject);
+
+    // Get unique month-year strings like "2025-09"
+    const months = Array.from(new Set(
+      filteredClasses.map(cls => {
+        const d = new Date(cls.date);
+        return `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, "0")}`;
+      })
+    ));
+
+    res.status(200).json(months);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};

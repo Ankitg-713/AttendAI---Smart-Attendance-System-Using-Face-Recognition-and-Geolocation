@@ -8,6 +8,9 @@ const {
   getClassAttendance,
   updateAttendance,
   getTeacherAnalytics,
+  getTeacherStudentsAttendance,
+  getTeacherOptions,
+  getAttendanceMonths,
 } = require('../controllers/attendanceController');
 
 const { verifyToken, verifyRole } = require('../middleware/authMiddleware');
@@ -22,5 +25,25 @@ router.get('/pending', verifyToken, verifyRole('student'), getPendingClasses);
 router.get('/class/:classId', verifyToken, verifyRole('teacher'), getClassAttendance);
 router.post('/update', verifyToken, verifyRole('teacher'), updateAttendance);
 router.get('/teacher/analytics', verifyToken, verifyRole('teacher'), getTeacherAnalytics);
+router.get(
+  "/teacher/students",
+  verifyToken,
+  verifyRole("teacher"),
+  getTeacherStudentsAttendance
+);
+router.get(
+  "/teacher/options",
+  verifyToken,
+  verifyRole("teacher"),
+  getTeacherOptions
+);
+router.get(
+  '/teacher/months',
+  verifyToken,
+  verifyRole('teacher'),
+  getAttendanceMonths
+);
+
+
 
 module.exports = router;
