@@ -38,7 +38,6 @@ exports.getTeachers = async (req, res) => {
     const teachers = await User.find({ role: 'teacher' }).select('-password -faceDescriptor');
     res.json(teachers);
   } catch (err) {
-    console.error('Error fetching teachers:', err);
     res.status(500).json({ message: 'Failed to fetch teachers' });
   }
 };

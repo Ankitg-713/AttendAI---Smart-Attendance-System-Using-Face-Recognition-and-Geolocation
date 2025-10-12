@@ -18,7 +18,7 @@ export default function ViewAttendance() {
 
       try {
         const res = await axios.get(
-          "http://localhost:8000/api/attendance/student/analytics",
+          `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/attendance/student/analytics`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
@@ -30,7 +30,6 @@ export default function ViewAttendance() {
 
         setData(res.data || []);
       } catch (err) {
-        console.error("Error fetching attendance analytics:", err);
         toast.error("Failed to load attendance data.");
       } finally {
         // reset flag so future fetches can trigger toast again

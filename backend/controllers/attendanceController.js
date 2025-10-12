@@ -3,20 +3,7 @@ const User = require("../models/User");
 const Class = require("../models/Class");
 const Attendance = require("../models/Attendance");
 const Subject = require("../models/Subject");
-
-const FIXED_LOCATION = {
-  latitude: 13.014720706793945,
-  longitude: 77.66648958209365,
-  //latitude: 13.006058,
-  //longitude: 77.651001,
-};
-
-const euclideanDistance = (arr1, arr2) => {
-  if (arr1.length !== arr2.length) return Infinity;
-  return Math.sqrt(
-    arr1.reduce((sum, val, i) => sum + Math.pow(val - arr2[i], 2), 0)
-  );
-};
+const { euclideanDistance, FACE_MATCH_THRESHOLD } = require("../utils/faceRecognition");
 
 // ==============================
 // @desc    Mark Attendance
@@ -32,12 +19,27 @@ exports.markAttendance = async (req, res) => {
       return res.status(400).json({ message: "Incomplete data provided" });
     }
 
-    const users = await User.find({ role: "student" });
+    // ✅ Optimization: Get logged-in student's details first
+    const currentStudent = await User.findById(req.user.id).select(
+      "course semester role faceDescriptor"
+    );
+    
+    if (!currentStudent || currentStudent.role !== "student") {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    // ✅ Performance: Only fetch students from same course/semester
+    const users = await User.find({ 
+      role: "student",
+      course: currentStudent.course,
+      semester: currentStudent.semester
+    }).select('faceDescriptor');
+    
     let matchedUser = null;
 
     for (let user of users) {
       const distance = euclideanDistance(faceDescriptor, user.faceDescriptor);
-      if (distance < 0.6) {
+      if (distance < FACE_MATCH_THRESHOLD) {
         matchedUser = user;
         break;
       }
@@ -49,10 +51,14 @@ exports.markAttendance = async (req, res) => {
     if (matchedUser._id.toString() !== req.user.id)
       return res.status(403).json({ message: "You cannot mark for others" });
 
+    const currentClass = await Class.findById(classId);
+    if (!currentClass)
+      return res.status(400).json({ message: "Class not found" });
+
     const isNearby = geolib.isPointWithinRadius(
       { latitude, longitude },
-      FIXED_LOCATION,
-      100
+      { latitude: currentClass.latitude, longitude: currentClass.longitude },
+      50
     );
 
     if (!isNearby)
@@ -60,22 +66,10 @@ exports.markAttendance = async (req, res) => {
         message: "You are not within allowed location range",
       });
 
-    const currentClass = await Class.findById(classId);
-    if (!currentClass)
-      return res.status(400).json({ message: "Class not found" });
-
-    // 🔥 Fetch full student details from DB
-    const studentDoc = await User.findById(req.user.id).select(
-      "course semester role"
-    );
-    if (!studentDoc || studentDoc.role !== "student") {
-      return res.status(403).json({ message: "Unauthorized" });
-    }
-
-    // ✅ Now compare using studentDoc
+    // ✅ Use already fetched currentStudent
     if (
-      currentClass.semester !== studentDoc.semester ||
-      currentClass.course !== studentDoc.course
+      currentClass.semester !== currentStudent.semester ||
+      currentClass.course !== currentStudent.course
     ) {
       return res.status(403).json({
         message: "This class is not available for your semester/course",
@@ -114,7 +108,6 @@ exports.markAttendance = async (req, res) => {
     await attendance.save();
     res.status(200).json({ message: "Attendance marked successfully" });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -133,7 +126,6 @@ exports.getStudentHistory = async (req, res) => {
 
     res.status(200).json(attendance);
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -198,7 +190,6 @@ exports.getStudentAnalytics = async (req, res) => {
 
     res.status(200).json(result);
   } catch (err) {
-    console.error("❌ Error in getStudentAnalytics:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -241,7 +232,6 @@ exports.getClassAttendance = async (req, res) => {
 
     res.status(200).json(records);
   } catch (err) {
-    console.error("❌ getClassAttendance error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -291,7 +281,6 @@ exports.getPendingClasses = async (req, res) => {
 
     return res.status(200).json(pending);
   } catch (err) {
-    console.error(err);
     return res.status(500).json({ message: "Server error" });
   }
 };
@@ -332,7 +321,6 @@ exports.updateAttendance = async (req, res) => {
 
     res.status(200).json({ message: "Attendance updated", record });
   } catch (err) {
-    console.error("❌ updateAttendance error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -389,7 +377,6 @@ exports.getTeacherAnalytics = async (req, res) => {
 
     res.status(200).json(analytics);
   } catch (err) {
-    console.error("❌ getTeacherAnalytics error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -483,7 +470,6 @@ exports.getTeacherStudentsAttendance = async (req, res) => {
 
     res.status(200).json(attendanceMatrix);
   } catch (err) {
-    console.error("❌ getTeacherStudentsAttendance error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -504,7 +490,6 @@ exports.getTeacherOptions = async (req, res) => {
 
     res.status(200).json({ courses, semesters, subjects: subjectNames });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -540,7 +525,6 @@ exports.getAttendanceMonths = async (req, res) => {
 
     res.status(200).json(months);
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 };

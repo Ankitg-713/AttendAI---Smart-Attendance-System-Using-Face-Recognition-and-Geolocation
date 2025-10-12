@@ -21,12 +21,11 @@ export default function ScheduleClass() {
     const fetchSubjects = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:8000/api/teacher/subjects",
+          `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/teacher/subjects`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setSubjects(res.data || []);
       } catch (err) {
-        console.error("Error fetching subjects:", err);
         if (!toastActive.current) {
           toastActive.current = true;
           toast.error("Failed to fetch subjects");
@@ -47,7 +46,6 @@ export default function ScheduleClass() {
           longitude: position.coords.longitude,
         })),
       (err) => {
-        console.error("Geolocation error:", err);
         if (!toastActive.current) {
           toastActive.current = true;
           toast.error("Failed to get location");
@@ -64,7 +62,7 @@ export default function ScheduleClass() {
     e.preventDefault();
     try {
       await axios.post(
-        "http://localhost:8000/api/classes",
+        `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/classes`,
         { ...form },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -83,7 +81,6 @@ export default function ScheduleClass() {
         endTime: "",
       }));
     } catch (err) {
-      console.error(err);
       if (!toastActive.current) {
         toastActive.current = true;
         toast.error(err.response?.data?.message || "Failed to schedule class");

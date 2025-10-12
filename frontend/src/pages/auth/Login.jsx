@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -6,7 +6,6 @@ import toast from "react-hot-toast";
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const navigate = useNavigate();
-  const toastActive = useRef(false); // ✅ prevents duplicate toast
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -15,33 +14,30 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (toastActive.current) return; // prevent duplicate toast
-    toastActive.current = true;
-
     try {
       const payload = { email: form.email, password: form.password };
       const res = await axios.post(
-        "http://localhost:8000/api/auth/login",
+        `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/auth/login`,
         payload
       );
       localStorage.setItem("token", res.data.token);
       const role = res.data.user?.role;
 
-      toast.success("Login successful!");
+      toast.success("Login successful!", { duration: 2000 });
 
-      // Navigate based on role
-      if (role === "student") navigate("/student/dashboard");
-      else if (role === "teacher") navigate("/teacher/dashboard");
-      else if (role === "admin") navigate("/admin/dashboard");
-      else toast.error("Invalid role");
-    } catch (err) {
-      console.error(err);
-      toast.error(err.response?.data?.message || "Login failed");
-    } finally {
-      // Reset flag so next submission works
+      // Navigate after a short delay to show the toast
       setTimeout(() => {
-        toastActive.current = false;
-      }, 100); // small delay to ensure toast renders once
+        // Dismiss all toasts before navigating
+        toast.dismiss();
+        
+        // Navigate based on role
+        if (role === "student") navigate("/student/dashboard");
+        else if (role === "teacher") navigate("/teacher/dashboard");
+        else if (role === "admin") navigate("/admin/dashboard");
+        else toast.error("Invalid role");
+      }, 1500);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Login failed");
     }
   };
 

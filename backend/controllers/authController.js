@@ -1,13 +1,7 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
-
-const euclideanDistance = (arr1, arr2) => {
-  if (arr1.length !== arr2.length) return Infinity;
-  return Math.sqrt(
-    arr1.reduce((sum, val, i) => sum + Math.pow(val - arr2[i], 2), 0)
-  );
-};
+const { euclideanDistance, FACE_MATCH_THRESHOLD } = require("../utils/faceRecognition");
 
 // ========================
 // @desc    Register User
@@ -47,7 +41,6 @@ exports.register = async (req, res) => {
 
     res.status(201).json({ message: "User registered successfully" });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -88,7 +81,6 @@ exports.login = async (req, res) => {
       },
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -118,7 +110,6 @@ exports.getCurrentUser = async (req, res) => {
       semester: user.semester || null, // only students will have this
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 };

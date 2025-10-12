@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import FaceCapture from "../../components/FaceCapture";
@@ -17,7 +17,6 @@ export default function Register() {
   const [faceDescriptor, setFaceDescriptor] = useState(null);
   const [semesters, setSemesters] = useState([]);
   const navigate = useNavigate();
-  const toastActive = useRef(false); // ✅ prevents duplicate toast
 
   useEffect(() => {
     if (form.course === "MCA") {
@@ -35,35 +34,29 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (toastActive.current) return; // prevent duplicate toast
-    toastActive.current = true;
-
     if (!faceDescriptor) {
       toast.error("Please capture your face before submitting.");
-      toastActive.current = false;
       return;
     }
 
     if (form.role === "student" && (!form.course || !form.semester)) {
       toast.error("Please select course and semester.");
-      toastActive.current = false;
       return;
     }
 
     try {
       const payload = { ...form, faceDescriptor };
-      await axios.post("http://localhost:8000/api/auth/register", payload);
+      await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/auth/register`, payload);
 
-      toast.success("Registration successful!");
-      navigate("/login");
-    } catch (err) {
-      console.error(err);
-      toast.error(err.response?.data?.message || "Registration failed");
-    } finally {
-      // reset flag for next submission
+      toast.success("Registration successful!", { duration: 2000 });
+      
+      // Dismiss all toasts and navigate after delay
       setTimeout(() => {
-        toastActive.current = false;
-      }, 100);
+        toast.dismiss();
+        navigate("/login");
+      }, 1500);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Registration failed");
     }
   };
 

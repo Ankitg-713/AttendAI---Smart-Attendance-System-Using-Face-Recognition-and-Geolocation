@@ -30,4 +30,9 @@ const userSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
+// Indexes for performance
+userSchema.index({ email: 1 }, { unique: true });
+userSchema.index({ role: 1 });
+userSchema.index({ course: 1, semester: 1 });
+
 module.exports = mongoose.model('User', userSchema);

@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 
@@ -7,6 +8,7 @@ export default function AdminDashboard() {
   const [teachers, setTeachers] = useState([]);
   const [selectedTeacher, setSelectedTeacher] = useState({});
   const hasFetched = useRef(false); // 👈 prevents duplicate API call & toast
+  const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
 
@@ -19,14 +21,14 @@ export default function AdminDashboard() {
       try {
         // Fetch all subjects
         const subjectRes = await axios.get(
-          "http://localhost:8000/api/admin/subjects",
+          `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/admin/subjects`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setSubjects(subjectRes.data);
 
         // Fetch all teachers
         const teacherRes = await axios.get(
-          "http://localhost:8000/api/admin/teachers",
+          `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/admin/teachers`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setTeachers(teacherRes.data);
@@ -40,7 +42,6 @@ export default function AdminDashboard() {
 
         toast.success("✅ Data loaded successfully");
       } catch (err) {
-        console.error("Error fetching data:", err);
         toast.error("❌ Failed to load subjects or teachers");
       }
     };
@@ -63,7 +64,7 @@ export default function AdminDashboard() {
 
     try {
       const res = await axios.post(
-        "http://localhost:8000/api/admin/assign-teacher",
+        `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/admin/assign-teacher`,
         { subjectId, teacherId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -77,11 +78,21 @@ export default function AdminDashboard() {
         )
       );
     } catch (err) {
-      console.error("Assign teacher error:", err);
       toast.error(
         `❌ ${err.response?.data?.message || "Failed to assign teacher"}`
       );
     }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    toast.success("Logged out successfully!", { duration: 2000 });
+    
+    // Dismiss all toasts and navigate after delay
+    setTimeout(() => {
+      toast.dismiss();
+      navigate("/login");
+    }, 1500);
   };
 
   return (
@@ -141,6 +152,28 @@ export default function AdminDashboard() {
             ))}
           </tbody>
         </table>
+      </div>
+
+      <div className="mt-6 flex justify-end">
+        <button
+          onClick={handleLogout}
+          className="px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 shadow-md hover:shadow-lg transition-all duration-300 text-white font-semibold flex items-center gap-2 group"
+        >
+          <svg 
+            className="w-5 h-5 group-hover:scale-110 transition-transform" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={2} 
+              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" 
+            />
+          </svg>
+          <span>Logout</span>
+        </button>
       </div>
     </div>
   );

@@ -19,4 +19,8 @@ const subjectSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
+// Indexes for performance
+subjectSchema.index({ teacher: 1 });
+subjectSchema.index({ course: 1, semester: 1 });
+
 module.exports = mongoose.model('Subject', subjectSchema);

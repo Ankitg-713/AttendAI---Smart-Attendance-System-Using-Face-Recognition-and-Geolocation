@@ -8,9 +8,9 @@ const Subject = require('../models/Subject');
 // ==============================
 exports.createClass = async (req, res) => {
   try {
-    const { subject: subjectId, date, startTime, endTime } = req.body;
+    const { subject: subjectId, date, startTime, endTime, latitude, longitude } = req.body;
 
-    if (!subjectId || !date || !startTime || !endTime) {
+    if (!subjectId || !date || !startTime || !endTime || !latitude || !longitude) {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
@@ -32,6 +32,8 @@ exports.createClass = async (req, res) => {
       endTime,
       semester: subject.semester,
       course: subject.course,
+      latitude,
+      longitude,
     });
 
     await newClass.save();
@@ -40,7 +42,6 @@ exports.createClass = async (req, res) => {
       .status(201)
       .json({ message: 'Class scheduled successfully', class: newClass });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -55,7 +56,6 @@ exports.getTeacherClasses = async (req, res) => {
     const classes = await Class.find({ teacher: req.user.id }).sort({ date: 1 }).populate('subject', 'name semester course');
     res.status(200).json(classes);
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -82,7 +82,6 @@ exports.getStudentClasses = async (req, res) => {
 
     res.status(200).json(classes);
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -96,7 +95,6 @@ exports.getAllClasses = async (req, res) => {
     const classes = await Class.find().populate('teacher', 'name email').populate('subject', 'name semester course');
     res.status(200).json({ classes });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'Error fetching classes' });
   }
 };

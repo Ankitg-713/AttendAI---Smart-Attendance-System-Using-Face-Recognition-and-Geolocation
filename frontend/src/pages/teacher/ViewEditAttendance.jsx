@@ -19,7 +19,7 @@ export default function ViewEditAttendance() {
     const fetchClasses = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:8000/api/classes/teacher",
+          `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/classes/teacher`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setClasses(res.data || []);
@@ -29,7 +29,6 @@ export default function ViewEditAttendance() {
           setTimeout(() => (toastActive.current = false), 100);
         }
       } catch (err) {
-        console.error(err);
         if (!toastActive.current) {
           toastActive.current = true;
           toast.error("Failed to load classes");
@@ -83,7 +82,7 @@ export default function ViewEditAttendance() {
 
         for (let cls of filteredClasses) {
           const res = await axios.get(
-            `http://localhost:8000/api/attendance/class/${cls._id}`,
+            `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/attendance/class/${cls._id}`,
             { headers: { Authorization: `Bearer ${token}` } }
           );
 
@@ -111,7 +110,6 @@ export default function ViewEditAttendance() {
           setTimeout(() => (toastActive.current = false), 100);
         }
       } catch (err) {
-        console.error(err);
         setStatus("Failed to load students.");
         if (!toastActive.current) {
           toastActive.current = true;
@@ -128,7 +126,7 @@ export default function ViewEditAttendance() {
   const handleToggleAttendance = async (studentId, present, classId) => {
     try {
       await axios.post(
-        "http://localhost:8000/api/attendance/update",
+        `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/attendance/update`,
         { classId, studentId, present },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -150,7 +148,6 @@ export default function ViewEditAttendance() {
         setTimeout(() => (toastActive.current = false), 100);
       }
     } catch (err) {
-      console.error(err);
       if (!toastActive.current) {
         toastActive.current = true;
         toast.error("Failed to update attendance");

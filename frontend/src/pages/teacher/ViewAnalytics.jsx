@@ -27,7 +27,7 @@ export default function ViewAnalytics() {
     const fetchAnalytics = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:8000/api/attendance/teacher/analytics",
+          `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/attendance/teacher/analytics`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
@@ -50,7 +50,6 @@ export default function ViewAnalytics() {
         setAnalyticsData(processedData);
 
       } catch (err) {
-        console.error(err);
         if (!toastActive.current) {
           toastActive.current = true;
           toast.error("Failed to fetch analytics.");
@@ -68,12 +67,12 @@ export default function ViewAnalytics() {
     const fetchOptions = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:8000/api/attendance/teacher/options",
+          `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/attendance/teacher/options`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setOptions(res.data);
       } catch (err) {
-        console.error(err);
+        toast.error("Failed to fetch options");
       }
     };
     fetchOptions();

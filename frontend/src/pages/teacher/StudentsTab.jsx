@@ -21,7 +21,7 @@ export default function StudentsTab({
 
       try {
         const res = await axios.get(
-          "http://localhost:8000/api/attendance/teacher/months",
+          `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/attendance/teacher/months`,
           {
             headers: { Authorization: `Bearer ${token}` },
             params: {
@@ -34,7 +34,6 @@ export default function StudentsTab({
         // Convert "YYYY-MM" strings to Date objects
         setAvailableMonths(res.data.map((m) => new Date(`${m}-01`)));
       } catch (err) {
-        console.error(err);
         toast.error("Failed to fetch available months.");
       }
     };
@@ -68,12 +67,11 @@ export default function StudentsTab({
       }
 
       const res = await axios.get(
-        "http://localhost:8000/api/attendance/teacher/students",
+        `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/attendance/teacher/students`,
         { headers: { Authorization: `Bearer ${token}` }, params }
       );
       setStudentsData(res.data || []);
     } catch (err) {
-      console.error(err);
       toast.error("Failed to fetch students' attendance.");
     }
   };

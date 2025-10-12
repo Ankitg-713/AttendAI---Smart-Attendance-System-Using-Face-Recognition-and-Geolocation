@@ -4,18 +4,20 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App.jsx';
 import './index.css';
 import { Toaster } from 'react-hot-toast';
+import ErrorBoundary from './components/ErrorBoundary.jsx';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <App />
+    <ErrorBoundary>
+      <BrowserRouter>
+        <App />
       {/* 👇 add toaster here once, it will handle popups globally */}
       <Toaster
         position="bottom-right"
         reverseOrder={false}
         toastOptions={{
           success: {
-            duration: 2500,
+            duration: 2000,
             style: {
               background: "#ecfdf5", // light green
               color: "#065f46",
@@ -34,6 +36,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           },
         }}
       />
-    </BrowserRouter>
+      </BrowserRouter>
+    </ErrorBoundary>
   </React.StrictMode>
 );

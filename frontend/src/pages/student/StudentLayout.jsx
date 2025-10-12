@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -7,6 +7,7 @@ export default function StudentLayout() {
   const [student, setStudent] = useState({ name: "Student", course: "", semester: "" });
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const toastActive = useRef(false); // ✅ prevents duplicate toasts
 
   useEffect(() => {
@@ -21,13 +22,12 @@ export default function StudentLayout() {
           return;
         }
 
-        const res = await axios.get("http://localhost:8000/api/auth/me", {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/auth/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
         setStudent(res.data); // { id, name, role, course, semester }
       } catch (err) {
-        console.error("Failed to fetch student:", err);
         toast.error("Failed to fetch student details. Please try again.");
       } finally {
         // reset flag after small delay so future fetches can trigger toast if needed
@@ -39,6 +39,17 @@ export default function StudentLayout() {
 
     fetchStudent();
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    toast.success("Logged out successfully!", { duration: 2000 });
+    
+    // Dismiss all toasts and navigate after delay
+    setTimeout(() => {
+      toast.dismiss();
+      navigate("/login");
+    }, 1500);
+  };
 
   return (
     <div className="flex h-screen bg-[#e0e7ff]">
@@ -75,6 +86,26 @@ export default function StudentLayout() {
         >
           🧑‍💻 Mark Attendance
         </NavLink>
+
+        <button
+          onClick={handleLogout}
+          className="mt-auto px-4 py-3 rounded-lg bg-white/10 hover:bg-white/20 border border-white/30 hover:border-white/50 transition-all duration-300 text-white font-medium flex items-center justify-center gap-2 group"
+        >
+          <svg 
+            className="w-5 h-5 group-hover:scale-110 transition-transform" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={2} 
+              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" 
+            />
+          </svg>
+          <span>Logout</span>
+        </button>
       </aside>
 
       {/* Mobile overlay */}

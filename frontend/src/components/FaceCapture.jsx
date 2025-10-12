@@ -19,7 +19,7 @@ const FaceCapture = ({ onDescriptor }) => {
       navigator.mediaDevices
         .getUserMedia({ video: true })
         .then((stream) => (videoRef.current.srcObject = stream))
-        .catch((err) => console.error("Camera error:", err));
+        .catch(() => toast.error("Camera access denied"));
     };
 
     loadModels().then(() => {
@@ -54,14 +54,23 @@ const FaceCapture = ({ onDescriptor }) => {
 
   return (
     <div>
-      <video ref={videoRef} autoPlay muted width="300" height="220" />
+      <video 
+        ref={videoRef} 
+        autoPlay 
+        muted 
+        width="300" 
+        height="220"
+        aria-label="Camera feed for face capture"
+      />
       <button
         type="button"
         className="mt-2 p-2 bg-blue-600 text-white rounded"
         onClick={captureFace}
         disabled={loading}
+        aria-label="Capture face for attendance verification"
+        aria-disabled={loading}
       >
-        Capture Face
+        {loading ? "Loading..." : "Capture Face"}
       </button>
     </div>
   );

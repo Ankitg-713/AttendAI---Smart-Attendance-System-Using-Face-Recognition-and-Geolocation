@@ -31,6 +31,19 @@ const classSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  latitude: {
+    type: Number,
+    required: true,
+  },
+  longitude: {
+    type: Number,
+    required: true,
+  },
 }, { timestamps: true });
+
+// Indexes for performance
+classSchema.index({ teacher: 1, date: 1 });
+classSchema.index({ course: 1, semester: 1, date: 1 });
+classSchema.index({ subject: 1 });
 
 module.exports = mongoose.model('Class', classSchema);

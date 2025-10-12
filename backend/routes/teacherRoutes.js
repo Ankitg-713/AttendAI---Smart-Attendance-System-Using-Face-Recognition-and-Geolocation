@@ -10,7 +10,6 @@ router.get('/subjects', verifyToken, verifyRole('teacher'), async (req, res) => 
     const subjects = await Subject.find({ teacher: req.user.id });
     res.json(subjects);
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: 'Failed to fetch subjects' });
   }
 });

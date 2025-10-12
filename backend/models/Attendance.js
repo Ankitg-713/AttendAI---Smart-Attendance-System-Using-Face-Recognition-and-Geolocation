@@ -22,4 +22,9 @@ const attendanceSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
+// Indexes for performance
+attendanceSchema.index({ student: 1, class: 1 }, { unique: true });
+attendanceSchema.index({ class: 1 });
+attendanceSchema.index({ student: 1 });
+
 module.exports = mongoose.model('Attendance', attendanceSchema);
