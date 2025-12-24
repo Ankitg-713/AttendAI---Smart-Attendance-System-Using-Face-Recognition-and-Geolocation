@@ -2,11 +2,14 @@ const express = require('express');
 const router = express.Router();
 const { register, login, getCurrentUser } = require('../controllers/authController');
 const { verifyToken } = require('../middleware/authMiddleware');
+const { authLimiter } = require('../middleware/rateLimiter');
+const { validate, registerSchema, loginSchema } = require('../middleware/validators');
 
-router.post('/register', register);
-router.post('/login', login);
+// Auth routes with rate limiting and validation
+router.post('/register', authLimiter, validate(registerSchema), register);
+router.post('/login', authLimiter, validate(loginSchema), login);
 
-// Add this route to get current logged-in user info
+// Get current user (protected)
 router.get('/me', verifyToken, getCurrentUser);
 
 module.exports = router;

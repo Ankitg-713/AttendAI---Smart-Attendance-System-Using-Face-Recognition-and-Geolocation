@@ -5,6 +5,7 @@ const {
   getStudentHistory,
   getStudentAnalytics,
   getPendingClasses,
+  getMissedClasses,
   getClassAttendance,
   updateAttendance,
   getTeacherAnalytics,
@@ -14,36 +15,100 @@ const {
 } = require('../controllers/attendanceController');
 
 const { verifyToken, verifyRole } = require('../middleware/authMiddleware');
+const { sensitiveLimiter } = require('../middleware/rateLimiter');
+const { 
+  validate, 
+  markAttendanceSchema, 
+  updateAttendanceSchema,
+  teacherStudentsQuerySchema,
+} = require('../middleware/validators');
 
-// Student routes
-router.post('/mark', verifyToken, verifyRole('student'), markAttendance);
-router.get('/student/history', verifyToken, verifyRole('student'), getStudentHistory);
-router.get('/student/analytics', verifyToken, verifyRole('student'), getStudentAnalytics);
-router.get('/pending', verifyToken, verifyRole('student'), getPendingClasses);
+// ========================
+// Student Routes
+// ========================
+router.post(
+  '/mark', 
+  verifyToken, 
+  verifyRole('student'), 
+  sensitiveLimiter,
+  validate(markAttendanceSchema),
+  markAttendance
+);
 
-// Teacher route
-router.get('/class/:classId', verifyToken, verifyRole('teacher'), getClassAttendance);
-router.post('/update', verifyToken, verifyRole('teacher'), updateAttendance);
-router.get('/teacher/analytics', verifyToken, verifyRole('teacher'), getTeacherAnalytics);
 router.get(
-  "/teacher/students",
+  '/student/history', 
+  verifyToken, 
+  verifyRole('student'), 
+  getStudentHistory
+);
+
+router.get(
+  '/student/analytics', 
+  verifyToken, 
+  verifyRole('student'), 
+  getStudentAnalytics
+);
+
+router.get(
+  '/pending', 
+  verifyToken, 
+  verifyRole('student'), 
+  getPendingClasses
+);
+
+// NEW: Get missed classes
+router.get(
+  '/missed',
   verifyToken,
-  verifyRole("teacher"),
+  verifyRole('student'),
+  getMissedClasses
+);
+
+// ========================
+// Teacher Routes
+// ========================
+router.get(
+  '/class/:classId', 
+  verifyToken, 
+  verifyRole('teacher'), 
+  getClassAttendance
+);
+
+router.post(
+  '/update', 
+  verifyToken, 
+  verifyRole('teacher'),
+  sensitiveLimiter,
+  validate(updateAttendanceSchema),
+  updateAttendance
+);
+
+router.get(
+  '/teacher/analytics', 
+  verifyToken, 
+  verifyRole('teacher'), 
+  getTeacherAnalytics
+);
+
+router.get(
+  '/teacher/students',
+  verifyToken,
+  verifyRole('teacher'),
   getTeacherStudentsAttendance
 );
+
 router.get(
-  "/teacher/options",
+  '/teacher/options',
   verifyToken,
-  verifyRole("teacher"),
+  verifyRole('teacher'),
   getTeacherOptions
 );
+
 router.get(
   '/teacher/months',
   verifyToken,
   verifyRole('teacher'),
   getAttendanceMonths
 );
-
-
 
 module.exports = router;

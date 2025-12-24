@@ -1,6 +1,107 @@
-# 🎓 AttendAI - AI-Powered Attendance System
+# 🎓 AttendAI - AI-Powered Smart Attendance System
 
-An intelligent attendance management system that uses **facial recognition** and **GPS verification** to enable secure, automated attendance tracking for educational institutions.
+<div align="center">
+
+![AttendAI Banner](https://img.shields.io/badge/AttendAI-Smart%20Attendance-cyan?style=for-the-badge&logo=artificial-intelligence)
+
+**An intelligent attendance management system using Facial Recognition & GPS Geolocation**
+
+[![React](https://img.shields.io/badge/React-19.1.0-61DAFB?style=flat-square&logo=react)](https://react.dev/)
+[![Node.js](https://img.shields.io/badge/Node.js-16+-339933?style=flat-square&logo=node.js)](https://nodejs.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?style=flat-square&logo=mongodb)](https://www.mongodb.com/)
+[![TensorFlow.js](https://img.shields.io/badge/TensorFlow.js-face--api-FF6F00?style=flat-square&logo=tensorflow)](https://www.tensorflow.org/js)
+
+[Features](#-key-features) • [Demo](#-demo-credentials) • [Installation](#-quick-start) • [Deployment](#-deployment) • [Documentation](#-project-report)
+
+</div>
+
+---
+
+## 📋 Table of Contents
+
+- [About](#-about)
+- [Key Features](#-key-features)
+- [Demo Credentials](#-demo-credentials)
+- [Tech Stack](#-tech-stack)
+- [Quick Start](#-quick-start)
+- [Project Structure](#-project-structure)
+- [How It Works](#-how-it-works)
+- [API Endpoints](#-api-endpoints)
+- [Security](#-security-features)
+- [Deployment](#-deployment)
+- [Screenshots](#-screenshots)
+- [Project Report](#-project-report)
+- [Troubleshooting](#-troubleshooting)
+- [Future Enhancements](#-future-enhancements)
+- [License](#-license)
+
+---
+
+## 🎯 About
+
+**AttendAI** eliminates proxy attendance through a multi-layered verification system that combines:
+
+- 🤖 **AI-Powered Face Recognition** - Client-side biometric verification using TensorFlow.js
+- 📍 **GPS Geolocation** - 50-meter radius verification around classroom
+- ⏰ **Time Validation** - Attendance only during scheduled class hours
+- 🔐 **Role-Based Access** - Separate dashboards for Students, Teachers & Admins
+
+### Why AttendAI?
+
+| Traditional Methods | AttendAI |
+|---------------------|----------|
+| ❌ Proxy attendance possible | ✅ Face + Location verification |
+| ❌ 10-15 min roll call | ✅ Instant marking |
+| ❌ Manual errors | ✅ Automated & accurate |
+| ❌ No real-time analytics | ✅ Live dashboards |
+| ❌ Paper records | ✅ Digital audit trail |
+
+---
+
+## ✨ Key Features
+
+### 🔐 Multi-Layer Security
+- **Face Recognition** - AI-powered biometric verification using face-api.js
+- **GPS Verification** - Students must be within 50m of class location
+- **Time Validation** - Attendance only during scheduled class hours
+- **Late Detection** - Auto-marks attendance as "Late" after grace period
+- **JWT Authentication** - Secure token-based auth with 2-hour expiry
+- **Rate Limiting** - Protection against brute-force attacks
+
+### 📱 Student Features
+- Register with face capture
+- Mark attendance with real-time verification
+- View subject-wise attendance analytics with doughnut charts
+- Track attendance percentage & eligibility status
+- **Export attendance report to PDF** 📄
+- Auto-refresh pending classes list
+
+### 👨‍🏫 Teacher Features
+- Schedule classes with auto-captured GPS location
+- View and manually edit attendance records
+- Subject-wise analytics dashboard
+- Filter by month or view overall statistics
+- **Export class attendance to PDF** 📄
+- Cancel scheduled classes
+
+### 🏫 Admin Features
+- Assign teachers to subjects
+- Manage system users
+- Oversee all classes and attendance
+
+### 🎨 Modern UI/UX
+- **Futuristic Dark Theme** - Cyber-inspired design with animations
+- **Framer Motion Animations** - Smooth transitions & micro-interactions
+- **Glassmorphism Effects** - Modern translucent cards
+- **Responsive Design** - Works on mobile, tablet & desktop
+- **Real-time Toast Notifications** - Instant feedback
+
+### 📊 Analytics & Reporting
+- Subject-wise attendance breakdown
+- Eligibility status tracking (75% threshold)
+- Late vs Present statistics
+- Monthly attendance views
+- **PDF Report Generation** - Export attendance data
 
 ---
 
@@ -8,80 +109,64 @@ An intelligent attendance management system that uses **facial recognition** and
 
 | Role | Email | Password |
 |------|-------|----------|
-| **👑 Admin** | `admin@example.com` | `admin123` |
+| **👑 Admin** | `admin@example.com` | `admin@123` |
 | **👨‍🏫 Teacher** | `rohanjha6881@gmail.com` | `123456` |
 | **🎓 Student** | `ankitgupta6881@gmail.com` | `123456` |
 
-> Use these credentials to test the application locally. All accounts have face descriptors pre-configured.
-
----
-
-## ✨ Key Features
-
-### **🔐 Multi-Layer Security**
-- **Face Recognition** - AI-powered biometric verification using face-api.js
-- **GPS Verification** - Students must be within 50m of class location
-- **Time Validation** - Attendance only during scheduled class hours
-- **JWT Authentication** - Secure token-based authentication
-- **Role-Based Access** - Separate dashboards for Admin, Teacher, and Student
-
-### **📱 Student Features**
-- Register with face capture
-- Mark attendance with real-time verification
-- View subject-wise attendance analytics
-- Beautiful doughnut charts for visualization
-- Auto-refresh pending classes list
-
-### **👨‍🏫 Teacher Features**
-- Schedule classes with auto-captured GPS location
-- View and manually edit attendance records
-- Subject-wise analytics dashboard
-- Filter by month or view overall statistics
-- Export attendance data
-
-### **🏫 Admin Features**
-- Assign teachers to subjects
-- Manage system users
-- Oversee all classes and attendance
+> 💡 Run `node backend/scripts/seedData.js` to create these demo accounts.
 
 ---
 
 ## 🛠️ Tech Stack
 
-### **Frontend**
-- **Framework:** React 19.1.0 with Vite 7.0.4
-- **Styling:** Tailwind CSS 4.1.11
-- **AI/ML:** face-api.js (TensorFlow.js) for facial recognition
-- **Charts:** Chart.js + Recharts
-- **Routing:** React Router DOM 7.7.1
-- **Notifications:** React Hot Toast
-- **HTTP Client:** Axios
+### Frontend
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| React | 19.1.0 | UI Framework |
+| Vite | 7.0.4 | Build Tool |
+| Tailwind CSS | 4.1.11 | Styling |
+| Framer Motion | 11.x | Animations |
+| face-api.js | 0.22.2 | Face Recognition (TensorFlow.js) |
+| Chart.js | 4.5.0 | Data Visualization |
+| jsPDF | 2.x | PDF Generation |
+| React Router | 7.7.1 | Routing |
+| Axios | 1.11.0 | HTTP Client |
 
-### **Backend**
-- **Runtime:** Node.js with Express 5.1.0
-- **Database:** MongoDB with Mongoose 8.16.5
-- **Authentication:** JWT + bcrypt
-- **Geolocation:** Geolib for distance calculations
-- **Security:** CORS, role-based middleware
+### Backend
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| Node.js | 16+ | Runtime |
+| Express | 5.1.0 | Web Framework |
+| MongoDB | 5.0+ | Database |
+| Mongoose | 8.16.5 | ODM |
+| JWT | 9.0.2 | Authentication |
+| bcrypt | 5.x | Password Hashing |
+| Geolib | 3.3.4 | GPS Calculations |
+| Helmet | 8.x | Security Headers |
+| Compression | 1.x | GZIP Compression |
+| Joi | 17.x | Validation |
 
-### **AI Models**
-- TinyFaceDetector - Fast face detection
-- FaceLandmark68Net - Facial feature mapping
-- FaceRecognitionNet - 128-dimensional face embeddings
+### AI/ML Models (~35MB total)
+| Model | Purpose |
+|-------|---------|
+| TinyFaceDetector | Fast face detection |
+| FaceLandmark68Net | 68-point facial mapping |
+| FaceRecognitionNet | 128-dimensional embeddings |
 
 ---
 
 ## 🚀 Quick Start
 
-### **Prerequisites**
-- Node.js 16+ installed
-- MongoDB running (local or Atlas)
+### Prerequisites
+- Node.js 16+ 
+- MongoDB (local or [Atlas](https://www.mongodb.com/atlas))
+- Webcam & GPS-enabled device
 
-### **1. Clone & Install**
+### 1. Clone & Install
 
 ```bash
 # Clone repository
-git clone <repository-url>
+git clone https://github.com/yourusername/AttendAI.git
 cd AttendAI
 
 # Install backend dependencies
@@ -93,23 +178,30 @@ cd ../frontend
 npm install
 ```
 
-### **2. Setup Environment Variables**
+### 2. Environment Setup
 
-**Backend** - Create `backend/.env`:
+**Backend** (`backend/.env`):
 ```env
 MONGO_URI=mongodb://localhost:27017/attendai
-JWT_SECRET=your_super_secret_key_min_32_characters
+JWT_SECRET=your_super_secret_key_min_32_characters_long
 PORT=8000
 NODE_ENV=development
 FRONTEND_URL=http://localhost:5173
 ```
 
-**Frontend** - Create `frontend/.env`:
+**Frontend** (`frontend/.env`):
 ```env
 VITE_API_URL=http://localhost:8000
 ```
 
-### **3. Run Application**
+### 3. Seed Demo Data
+
+```bash
+cd backend
+node scripts/seedData.js
+```
+
+### 4. Run Application
 
 **Terminal 1 - Backend:**
 ```bash
@@ -125,41 +217,10 @@ npm run dev
 # App runs on http://localhost:5173
 ```
 
-### **4. Test with Demo Credentials**
-- Open http://localhost:5173
-- Login with any demo account from the table above
-- Test the features!
-
----
-
-## 📊 How It Works
-
-### **Attendance Marking Flow:**
-
-```
-1. Student logs in
-2. Selects scheduled class from dropdown
-3. Captures face via webcam
-4. Clicks "Mark Attendance"
-5. System validates:
-   ✓ Face matches registered descriptor (AI matching)
-   ✓ GPS location within 50m of class location
-   ✓ Current time within class schedule
-   ✓ Student enrolled in that course/semester
-   ✓ Not already marked for this class
-6. Attendance marked successfully ✅
-```
-
-### **Class Scheduling Flow:**
-
-```
-1. Teacher logs in
-2. Selects assigned subject
-3. Sets date and time
-4. System auto-captures teacher's GPS location
-5. Class created with location marker
-6. Students can now mark attendance within 50m radius
-```
+### 5. Test the App
+1. Open http://localhost:5173
+2. Login with demo credentials
+3. Try marking attendance!
 
 ---
 
@@ -168,468 +229,310 @@ npm run dev
 ```
 AttendAI/
 ├── backend/
-│   ├── controllers/       # Business logic
+│   ├── config/
+│   │   └── constants.js       # App configuration
+│   ├── controllers/
 │   │   ├── authController.js
 │   │   ├── attendanceController.js
 │   │   ├── classController.js
 │   │   └── adminController.js
-│   ├── models/           # MongoDB schemas
+│   ├── middleware/
+│   │   ├── authMiddleware.js  # JWT verification
+│   │   ├── rateLimiter.js     # Rate limiting
+│   │   └── validators.js      # Joi validation
+│   ├── models/
 │   │   ├── User.js
 │   │   ├── Class.js
 │   │   ├── Attendance.js
 │   │   └── Subject.js
-│   ├── routes/           # API endpoints
-│   ├── middleware/       # Auth & validation
-│   │   └── authMiddleware.js
-│   ├── utils/            # Helper functions
-│   │   └── faceRecognition.js
-│   └── server.js         # Express server
+│   ├── routes/
+│   ├── scripts/
+│   │   └── seedData.js        # Demo data seeder
+│   ├── utils/
+│   │   └── faceRecognition.js # Face matching utilities
+│   └── server.js
 │
 ├── frontend/
+│   ├── public/
+│   │   └── models/            # Face-api.js AI models
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── FaceCapture.jsx      # Camera & face detection
-│   │   │   └── ErrorBoundary.jsx    # Error handling
+│   │   │   ├── FaceCapture.jsx
+│   │   │   ├── ProtectedRoute.jsx
+│   │   │   └── ErrorBoundary.jsx
+│   │   ├── context/
+│   │   │   └── FaceModelContext.jsx
 │   │   ├── pages/
+│   │   │   ├── LandingPage.jsx
 │   │   │   ├── auth/
-│   │   │   │   ├── Login.jsx
-│   │   │   │   └── Register.jsx
 │   │   │   ├── student/
-│   │   │   │   ├── StudentLayout.jsx
-│   │   │   │   ├── MarkAttendance.jsx
-│   │   │   │   └── ViewAttendance.jsx
 │   │   │   ├── teacher/
-│   │   │   │   ├── TeacherLayout.jsx
-│   │   │   │   ├── ScheduleClass.jsx
-│   │   │   │   ├── ViewEditAttendance.jsx
-│   │   │   │   └── ViewAnalytics.jsx
 │   │   │   └── admin/
-│   │   │       └── AdminDashboard.jsx
 │   │   ├── services/
-│   │   │   └── axios.js          # API configuration
-│   │   └── App.jsx               # Routes
-│   └── public/models/            # Face-api.js AI models (~35MB)
+│   │   │   └── axios.js
+│   │   ├── utils/
+│   │   │   ├── pdfExport.js          # Attendance PDF export
+│   │   │   └── generateProjectReport.js  # Project report PDF
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   └── index.html
 │
+├── .gitignore
 └── README.md
 ```
 
 ---
 
-## 🔒 Security Implementation
+## 📊 How It Works
 
-### **Authentication**
-- JWT tokens with 2-hour expiration
-- bcrypt password hashing (10 salt rounds)
+### Attendance Marking Flow
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    STUDENT MARKS ATTENDANCE                  │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│  1. Select scheduled class from dropdown                     │
+│  2. Capture face via webcam                                  │
+│  3. System captures GPS coordinates                          │
+│  4. Click "Mark Attendance"                                  │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│              SERVER-SIDE VALIDATION                          │
+├─────────────────────────────────────────────────────────────┤
+│  ✓ JWT token valid                                           │
+│  ✓ Class exists & not cancelled                              │
+│  ✓ Student enrolled in course/semester                       │
+│  ✓ Current time within class hours                           │
+│  ✓ GPS within 50m of class location                          │
+│  ✓ Face matches registered descriptor (distance < 0.6)       │
+│  ✓ Not already marked for this class                         │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│  ATTENDANCE RECORDED                                         │
+│  Status: PRESENT (on time) or LATE (after 10 min)           │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Class Scheduling Flow
+
+```
+1. Teacher logs in
+2. Selects assigned subject
+3. Sets date and time
+4. System auto-captures teacher's GPS location
+5. Class created with location marker
+6. Students can mark attendance within 50m radius
+```
+
+---
+
+## 🔌 API Endpoints
+
+### Authentication (`/api/auth`)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/register` | Register with face descriptor |
+| POST | `/login` | Email/password login |
+| GET | `/me` | Get current user profile |
+
+### Attendance (`/api/attendance`)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/mark` | Mark attendance (student) |
+| GET | `/pending` | Get pending classes |
+| GET | `/student/analytics` | Subject-wise analytics |
+| GET | `/class/:id` | Class attendance (teacher) |
+| POST | `/update` | Edit attendance (teacher) |
+| GET | `/teacher/analytics` | Teacher analytics |
+| GET | `/teacher/students` | Student attendance matrix |
+
+### Classes (`/api/classes`)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/` | Create class (teacher) |
+| GET | `/teacher` | Teacher's classes |
+| GET | `/student` | Student's available classes |
+
+### Admin (`/api/admin`)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/subjects` | List all subjects |
+| POST | `/assign-teacher` | Assign teacher to subject |
+
+---
+
+## 🔒 Security Features
+
+### Authentication
+- **bcrypt** password hashing (10 salt rounds)
+- **JWT** tokens with 2-hour expiry
 - Role-based middleware protection
+- **Rate limiting** (100 auth requests / 15 min)
 
-### **Attendance Verification**
-- **Biometric:** Face descriptor matching (Euclidean distance < 0.6)
-- **Location:** GPS within 50m radius of class location
-- **Temporal:** Only during scheduled class time
-- **Authorization:** Course/semester validation
+### Anti-Fraud Measures
+| Threat | Countermeasure |
+|--------|----------------|
+| Proxy attendance | Face must match logged-in user |
+| Remote marking | GPS within 50m required |
+| Duplicate marking | Unique student+class constraint |
+| Photo spoofing | Live camera feed required |
+| API abuse | Rate limiting + Helmet headers |
 
-### **Anti-Fraud Measures**
-- Face matching prevents impersonation
-- GPS verification prevents remote attendance
-- Duplicate detection blocks multiple submissions
-- Time constraints enforce schedule compliance
+### Privacy Protection
+- Face processing happens **client-side only**
+- Only 128-dimensional descriptors stored (not images)
+- Descriptors cannot recreate faces
+- HTTPS required in production
 
 ---
 
-## 📊 Database Schema
+## 🌐 Deployment
 
-### **User Model**
-```javascript
-{
-  name: String,
-  email: String (unique),
-  password: String (hashed),
-  role: Enum ['student', 'teacher', 'admin'],
-  course: String (students only),
-  semester: Number (students only),
-  faceDescriptor: [Number] // 128-dimensional array
-}
+### Recommended Stack (Free Tier)
+
+| Component | Platform | Limits |
+|-----------|----------|--------|
+| Frontend | Vercel | Unlimited deploys |
+| Backend | Render | 750 hrs/month |
+| Database | MongoDB Atlas | 512MB free |
+
+### Quick Deploy Steps
+
+#### 1. Database (MongoDB Atlas)
+```
+1. Create account at mongodb.com/atlas
+2. Create free cluster (M0)
+3. Add database user
+4. Whitelist IP: 0.0.0.0/0
+5. Get connection string
 ```
 
-### **Class Model**
-```javascript
-{
-  subject: ObjectId → Subject,
-  teacher: ObjectId → User,
-  date: String (YYYY-MM-DD),
-  startTime: String (HH:mm),
-  endTime: String (HH:mm),
-  semester: Number,
-  course: String,
-  latitude: Number,  // GPS coordinates
-  longitude: Number  // GPS coordinates
-}
+#### 2. Backend (Render)
+```
+1. Create account at render.com
+2. New Web Service → Connect GitHub
+3. Settings:
+   - Root Directory: backend
+   - Build Command: npm install
+   - Start Command: npm start
+4. Add environment variables:
+   - MONGO_URI=<atlas-connection-string>
+   - JWT_SECRET=<random-64-chars>
+   - NODE_ENV=production
+   - FRONTEND_URL=<vercel-url>
 ```
 
-### **Attendance Model**
-```javascript
-{
-  student: ObjectId → User,
-  class: ObjectId → Class,
-  status: Enum ['present', 'absent'],
-  timestamp: Date
-}
+#### 3. Frontend (Vercel)
+```
+1. Create account at vercel.com
+2. Import GitHub repository
+3. Settings:
+   - Root Directory: frontend
+   - Build Command: npm run build
+   - Output Directory: dist
+4. Add environment variable:
+   - VITE_API_URL=<render-backend-url>
 ```
 
-### **Subject Model**
-```javascript
-{
-  name: String,
-  semester: Number,
-  course: String,
-  teacher: ObjectId → User
-}
-```
+### Production Checklist
+- [ ] Strong JWT_SECRET (64+ characters)
+- [ ] MongoDB Atlas IP whitelist
+- [ ] CORS configured with frontend URL
+- [ ] HTTPS enabled (automatic on Vercel/Render)
+- [ ] Rate limiting active
 
 ---
 
-## 🎯 API Endpoints
+## 📸 Screenshots
 
-### **Authentication** (`/api/auth`)
-- `POST /register` - User registration with face descriptor
-- `POST /login` - Email/password authentication
-- `GET /me` - Get current user profile
+### Landing Page
+- Futuristic dark theme with animated particles
+- Floating orbs and grid background
+- Smooth scroll animations
 
-### **Classes** (`/api/classes`)
-- `POST /` - Create class (teacher only)
-- `GET /teacher` - Get teacher's scheduled classes
-- `GET /student` - Get student's available classes
+### Student Dashboard
+- Pending classes list
+- Quick attendance marking
+- Subject-wise analytics with doughnut charts
 
-### **Attendance** (`/api/attendance`)
-- `POST /mark` - Mark attendance (student)
-- `GET /student/analytics` - Subject-wise attendance %
-- `GET /pending` - Get pending classes for student
-- `GET /class/:id` - Get class attendance (teacher)
-- `POST /update` - Manual attendance edit (teacher)
-- `GET /teacher/analytics` - Teacher analytics
+### Teacher Dashboard
+- Class scheduling with GPS capture
+- Attendance management
+- Monthly analytics view
 
-### **Admin** (`/api/admin`)
-- `GET /subjects` - List all subjects
-- `GET /teachers` - List all teachers
-- `POST /assign-teacher` - Assign teacher to subject
-
-### **Teacher** (`/api/teacher`)
-- `GET /subjects` - Get assigned subjects
-- `GET /options` - Get courses, semesters, subjects
+### Mark Attendance
+- Live camera feed
+- Face detection guide
+- GPS status indicator
 
 ---
 
-## ⚡ Performance Optimizations
+## 📄 Project Report
 
-- **Face Matching:** Optimized to search only within student's course/semester (6-18x faster)
-- **Database Indexes:** All frequently queried fields indexed
-- **Efficient Queries:** Compound indexes on course+semester, student+class
-- **Code Splitting:** React lazy loading for faster initial load
-- **Caching:** Face recognition utility centralized
+Generate a comprehensive PDF project report directly from the app!
 
----
-
-## 🎨 UI/UX Features
-
-- **Responsive Design:** Works on mobile, tablet, and desktop
-- **Modern UI:** Tailwind CSS with indigo theme
-- **Real-time Feedback:** Toast notifications for all actions
-- **Error Boundaries:** Graceful error handling
-- **Loading States:** Visual feedback during operations
-- **Accessibility:** ARIA labels, keyboard navigation
-- **Smooth Animations:** Hover effects and transitions
-
----
-
-## 🧪 Testing the Application
-
-### **As Admin:**
-1. Login with admin credentials
-2. Assign `rohanjha6881@gmail.com` to a subject
-3. Verify assignment successful
-
-### **As Teacher:**
-1. Login with teacher credentials
-2. Schedule a new class (your GPS location will be captured)
-3. View scheduled classes
-4. Check attendance after students mark
-
-### **As Student:**
-1. Login with student credentials
-2. Go to "Mark Attendance"
-3. Select a scheduled class
-4. Capture your face
-5. Click "Mark Attendance" (GPS will be checked)
-6. View your attendance analytics
-
----
-
-## 🔧 Environment Variables
-
-### **Backend** (`backend/.env`)
-```env
-MONGO_URI=mongodb://localhost:27017/attendai
-JWT_SECRET=<generate-random-64-char-string>
-PORT=8000
-NODE_ENV=development
-FRONTEND_URL=http://localhost:5173
-```
-
-### **Frontend** (`frontend/.env`)
-```env
-VITE_API_URL=http://localhost:8000
-```
-
----
-
-## 📱 Camera & GPS Requirements
-
-### **Development (localhost):**
-- ✅ Camera works on http://localhost
-- ✅ GPS works on http://localhost
-
-### **Production:**
-- ⚠️ **HTTPS required** for camera and GPS
-- Most hosting platforms provide free SSL certificates
-
----
-
-## 🎯 User Roles & Permissions
-
-| Feature | Student | Teacher | Admin |
-|---------|---------|---------|-------|
-| Register | ✅ | ✅ | Manual |
-| Mark Attendance | ✅ | ❌ | ❌ |
-| View Own Analytics | ✅ | ❌ | ❌ |
-| Schedule Classes | ❌ | ✅ | ❌ |
-| Edit Attendance | ❌ | ✅ | ❌ |
-| View Teacher Analytics | ❌ | ✅ | ❌ |
-| Assign Teachers | ❌ | ❌ | ✅ |
-| Manage Subjects | ❌ | ❌ | ✅ |
-
----
-
-## 🚨 Important Notes
-
-### **Face Recognition:**
-- Requires good lighting conditions
-- Camera must have clear view of face
-- Works best in frontal pose
-- 128-dimensional face embeddings used for matching
-
-### **GPS Location:**
-- 50-meter radius from class location
-- Accommodates GPS accuracy variance (±5-20m)
-- Teacher's location captured when scheduling class
-- Each class can have different location
-
-### **Time Constraints:**
-- Attendance only accepted during class hours
-- Based on start and end time of scheduled class
-- Server time used for validation
-
-### **Supported Courses:**
-- Currently: MCA (Semesters 1-4)
-- Easy to add more courses in registration form
-
----
-
-## 📦 Dependencies
-
-### **Backend**
-```json
-{
-  "express": "^5.1.0",
-  "mongoose": "^8.16.5",
-  "bcryptjs": "^3.0.2",
-  "jsonwebtoken": "^9.0.2",
-  "cors": "^2.8.5",
-  "geolib": "^3.3.4",
-  "dotenv": "^17.2.1"
-}
-```
-
-### **Frontend**
-```json
-{
-  "react": "^19.1.0",
-  "react-router-dom": "^7.7.1",
-  "face-api.js": "^0.22.2",
-  "axios": "^1.11.0",
-  "chart.js": "^4.5.0",
-  "react-chartjs-2": "^5.3.0",
-  "tailwindcss": "^4.1.11",
-  "react-hot-toast": "^2.6.0"
-}
-```
-
----
-
-## 🎨 Features Breakdown
-
-### **Student Dashboard**
-- **View Attendance** - Subject-wise attendance percentage with doughnut charts
-- **Mark Attendance** - Capture face and mark attendance for scheduled classes
-- **Real-time Updates** - Class list refreshes after marking attendance
-
-### **Teacher Dashboard**
-- **Schedule Class** - Create new classes with date, time, and auto-captured location
-- **View/Edit Attendance** - See all students and manually update if needed
-- **Analytics** - Subject-wise attendance statistics with filters
-
-### **Admin Dashboard**
-- **Subject Management** - View all subjects with semester and course info
-- **Teacher Assignment** - Assign teachers to specific subjects
-- **System Overview** - Complete control over the platform
-
----
-
-## 🔄 Workflow
-
-### **Initial Setup:**
-1. Admin creates/assigns teachers to subjects
-2. Teacher schedules classes for their subjects
-3. Students register with face capture
-4. Students mark attendance during class time
-
-### **Daily Usage:**
-1. Teacher schedules class → GPS location saved
-2. Class time arrives
-3. Students open app → See pending classes
-4. Student captures face → Marks attendance
-5. System verifies all conditions
-6. Attendance recorded instantly
-7. Analytics updated in real-time
-
----
-
-## 📈 Performance
-
-- **Face Matching:** 6-18x faster (optimized with course/semester filtering)
-- **Database Queries:** All models indexed for fast lookups
-- **API Response Time:** ~100-200ms average
-- **Frontend Load Time:** ~2-3 seconds (with 35MB face models)
-
----
-
-## 🔐 Security Features
-
-### **Password Security**
-- bcrypt hashing with 10 salt rounds
-- Passwords never exposed in API responses
-- JWT tokens expire after 2 hours
-
-### **Face Recognition Security**
-- 128-dimensional embeddings (not images stored)
-- Euclidean distance matching (threshold: 0.6)
-- Prevents proxy attendance
-- Face must match logged-in user
-
-### **Location Security**
-- 50-meter geofencing
-- Class-specific locations (not global)
-- Prevents remote attendance
-- Validates coordinates server-side
-
-### **Authorization**
-- JWT token verification on all protected routes
-- Role-based access control middleware
-- Course/semester validation for students
-- Teacher-subject assignment verification
-
----
-
-## 📊 Database Indexes
-
-Optimized for fast queries:
-
-- **User:** email (unique), role, course+semester
-- **Class:** teacher+date, course+semester+date, subject
-- **Attendance:** student+class (unique), student, class
-- **Subject:** teacher, course+semester
-
----
-
-## 🎯 Core Technologies Explained
-
-### **Face-api.js**
-- Built on TensorFlow.js
-- Runs entirely in browser
-- Models loaded from `/public/models/`
-- Real-time face detection and recognition
-- No data sent to external servers
-
-### **Geolocation API**
-- Browser's native GPS
-- High accuracy mode enabled
-- Geolib calculates distance between coordinates
-- 50m radius allows for GPS variance
-
-### **JWT Authentication**
-- Stateless authentication
-- Token contains user ID and role
-- Bearer token in Authorization header
-- Middleware validates on every protected route
-
----
-
-## 💡 Tips for Best Results
-
-### **Face Capture:**
-- Use good lighting (natural or bright artificial)
-- Face camera directly
-- Remove glasses/masks if causing issues
-- Capture in similar conditions as you'll use daily
-
-### **GPS Accuracy:**
-- Enable high accuracy mode
-- Allow location permissions
-- Use outdoors or near windows for better signal
-- Wait a few seconds for GPS to stabilize
-
-### **Class Scheduling:**
-- Schedule from the actual classroom location
-- This sets the 50m attendance zone
-- Students must be within this zone to mark attendance
+### How to Download:
+1. Go to the Landing Page
+2. Scroll to the footer
+3. Click **"Download Project Report"**
+4. A 14-page PDF will be generated with:
+   - Cover page
+   - Table of contents
+   - Abstract & Introduction
+   - System architecture
+   - Tech stack details
+   - Database design
+   - Security features
+   - Testing results
+   - And more!
 
 ---
 
 ## 🐛 Troubleshooting
 
-### **Camera Not Working**
+### Camera Not Working
 - Check browser permissions
-- Must use HTTPS in production (works on localhost)
-- Try different browser (Chrome recommended)
+- Use HTTPS in production
+- Try Chrome (recommended)
 
-### **GPS Not Accurate**
-- Enable location services
-- Allow high accuracy mode
-- Move near window or outdoors
-- Check device GPS is enabled
+### GPS Inaccurate
+- Enable high accuracy mode
+- Move near window/outdoors
+- Wait for GPS stabilization
 
-### **Face Not Recognized**
+### Face Not Recognized
 - Ensure good lighting
 - Face camera directly
-- Try recapturing face
-- Check if face descriptor was saved during registration
+- Re-register face if needed
 
-### **"Class Not Active"**
-- Check current time vs class schedule
-- System uses server time for validation
-- Ensure class date is today
+### "Class Not Active"
+- Check class schedule
+- Verify date is today
+- Server time is used
+
+### CORS Error
+- Add frontend URL to backend FRONTEND_URL env
+- Redeploy backend
 
 ---
 
 ## 🚀 Future Enhancements
 
-Potential features to add:
-- Email notifications for scheduled classes
-- Attendance reports export (PDF/CSV)
-- Multi-face capture (backup face descriptors)
-- Attendance history calendar view
-- Push notifications for upcoming classes
-- Bulk class scheduling
-- Leave/absence request system
+- [ ] Mobile app (React Native)
+- [ ] Multiple face descriptors per user
+- [ ] Email/push notifications
+- [ ] Leave request system
+- [ ] Bulk class scheduling
+- [ ] Liveness detection (anti-spoofing)
+- [ ] Multi-institution support
+- [ ] LMS integration
 
 ---
 
@@ -641,27 +544,34 @@ This project is for educational purposes.
 
 ## 🙏 Acknowledgments
 
-- **face-api.js** - Excellent face recognition library
-- **MongoDB** - Flexible NoSQL database
-- **React Team** - Amazing frontend framework
-- **Tailwind CSS** - Beautiful utility-first CSS
+- [face-api.js](https://github.com/justadudewhohacks/face-api.js) - Face recognition
+- [TensorFlow.js](https://www.tensorflow.org/js) - ML in browser
+- [MongoDB](https://www.mongodb.com/) - Database
+- [React](https://react.dev/) - UI framework
+- [Tailwind CSS](https://tailwindcss.com/) - Styling
+- [Framer Motion](https://www.framer.com/motion/) - Animations
 
 ---
 
-## ⭐ Features Highlights
+## ⭐ Feature Highlights
 
 | Feature | Benefit |
 |---------|---------|
-| AI Face Recognition | Eliminates proxy attendance fraud |
-| GPS Verification | Ensures physical presence |
-| Time Validation | Enforces punctuality |
-| Real-time Analytics | Instant insights for students & teachers |
-| Role-based Dashboards | Clean, focused interface for each user type |
-| Error Boundaries | Graceful crash handling |
-| Optimized Performance | Fast face matching & database queries |
-| Modern UI | Beautiful, responsive, accessible |
+| 🤖 AI Face Recognition | Eliminates proxy attendance |
+| 📍 GPS Verification | Ensures physical presence |
+| ⏰ Late Detection | Auto-tracks punctuality |
+| 📊 Real-time Analytics | Instant insights |
+| 📄 PDF Export | Easy record-keeping |
+| 🎨 Modern UI | Beautiful, responsive design |
+| 🔐 Multi-layer Security | Fraud-proof system |
+| ⚡ Optimized Performance | Fast face matching |
 
 ---
 
+<div align="center">
+
 **Built with ❤️ for modern education management**
 
+[⬆ Back to Top](#-attendai---ai-powered-smart-attendance-system)
+
+</div>
